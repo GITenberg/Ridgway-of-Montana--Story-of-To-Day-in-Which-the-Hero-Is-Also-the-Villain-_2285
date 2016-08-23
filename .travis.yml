@@ -1,0 +1,61 @@
+sudo: required
+dist: trusty
+language: ruby
+
+before_install:
+before_install:
+- gem install asciidoctor -v 1.5.2
+- gem install tilt
+- sudo pip install git+https://github.com/gitenberg-dev/gitberg
+- sudo pip install pillow
+- sudo pip install cssutils
+- sudo pip install docutils
+- sudo pip install roman
+- sudo pip install git+https://github.com/gitenberg-dev/pg-epubmaker
+script:
+- VERSION=`ruby -e "require 'yaml'; meta = YAML.load_file('metadata.yaml'); puts meta['_version'];"`
+- git clone https://github.com/gitenberg-dev/asciidoctor-htmlbook.git
+- sudo pip install -r asciidoctor-htmlbook/gitberg-machine/requirements.txt
+
+- /usr/bin/python -c "from gitenberg import travis; travis.build_epub()"
+- ebook-convert book.epub book.mobi
+- xvfb-run ebook-convert book.epub book.pdf
+branches:
+  only:
+  - master
+notifications:
+  webhooks:
+    urls:
+      - https://unglue.it/api/travisci/webhook
+    on_success: always
+    on_failure: never
+    on_start: never
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: cRyTBROD9/HpQQ2edfWt0BB6WFQ3fvXz12ipfd2malop4XAdUYrSz7hmY9kPd3rj0OsNchfe+Sq1rhhHyYrnPoI9rnRyGnHqNrObiak05bY10SJumLXnRWyHqqCA2LVLBH2nuoFMsPL+Deelq/JeNEmQSHTapnDV+kt7O1U+wcb7Otj60OuzQYXDDTyadB3PcKfjeqZTQbM4b5LQqZQ7XTDBgwWN0NZZOuIROkJj+pvRGUFAw/L4TuGzbl6lW0XAso0ndnS5rBDsyXVaiqrqxaAIv5UbfMK+oRV3QoT9zCQf5JhLS6Bs3/NvBFIGLXfauSsWfXf/BfVaQRKL46Bph7jThHDl6+ht4faPgwigZ48LjGcLM3jU23TM2sjkRey4bivJ28KtMm2u4oZJuuN/eJ+afkhRNDVBQ8Iy8nfe1pytIpWoKsQWG49N9nl1e8929pa29EBsKThb4m7Ovpvt+HTDoWqaSy2XknOg8lB74dX3x//NWqLT95ADp0H1ukLY4hhRn/9xnG3iXRGVoXvo9bqdb8oZIpJrtUFNjQNnEom3nzLnQVyCR1BNSOoUK29S61F2S0tcGaTj0bxKDkhSvzjiliOdn/N/jme/j/Yl1GgbEyqUQZOteN9SWgfl7ToW6lXBIIIK64XP4T4Rh4nFXd38gyv4QGZaCJueYJRK1qQ=
+  file:
+    - book.epub
+    - book.mobi
+    - book.pdf
+  "on":
+    repo: GITenberg/Ridgway-of-Montana--Story-of-To-Day-in-Which-the-Hero-Is-Also-the-Villain-_2285
+addons:
+  apt:
+    packages:
+    - xsltproc
+    - xvfb
+    - calibre
+    - python-pip
+    - git
+    - python-dev
+    - libjpeg-dev
+    - libpng-dev
+    - libfreetype6
+    - libfreetype6-dev
+    - zlib1g-dev
+    - python-lxml
+    - libxml2-dev
+    - libxslt1-dev
+    - tidy
